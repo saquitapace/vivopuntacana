@@ -1,22 +1,22 @@
-@import "../public/assets/css/bootstrap.min.css";
+@import '../public/assets/css/bootstrap.min.css';
 /* <!--====== FontAwesoem css ======--> */
-@import "../public/assets/fonts/themify-icons/themify-icons.css";
+@import '../public/assets/fonts/themify-icons/themify-icons.css';
 /* <!--====== Flaticon css ======--> */
-@import "../public/assets/fonts/flaticon/flaticon.css";
+@import '../public/assets/fonts/flaticon/flaticon.css';
 /* <!--====== Magnific Popup css ======--> */
-@import "../public/assets/css/magnific-popup.css";
+@import '../public/assets/css/magnific-popup.css';
 /* <!--====== Slick css ======--> */
-@import "../public/assets/css/slick.css";
+@import '../public/assets/css/slick.css';
 /* <!--====== Nice-select css ======--> */
-@import "../public/assets/css/nice-select.css";
+@import '../public/assets/css/nice-select.css';
 /* <!--====== Jquery ui css ======--> */
-@import "../public/assets/css/jquery-ui.min.css";
+@import '../public/assets/css/jquery-ui.min.css';
 /* <!--====== Animate css ======--> */
-@import "../public/assets/css/animate.css";
+@import '../public/assets/css/animate.css';
 /* <!--====== Default css ======--> */
-@import "../public/assets/css/default.css";
+@import '../public/assets/css/default.css';
 /* <!--====== Style css ======--> */
-@import "../public/assets/css/style.css";
+@import '../public/assets/css/style.css';
 
 html {
   scroll-behavior: smooth;
@@ -105,3 +105,5 @@ img.mfp-img {
 .header-navigation .main-menu ul > li.has-children.active > a:after {
   color: #ff344f !important;
 }
+
+/* calendar */
