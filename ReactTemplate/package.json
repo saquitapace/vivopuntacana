@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/nextjs": "^4.8.0",
     "@reduxjs/toolkit": "^1.6.1",
     "autoprefixer": "^10.4.20",
     "babel-plugin-module-resolver": "^5.0.2",
@@ -16,6 +17,7 @@
     "isotope-layout": "^3.0.6",
     "lodash": "^4.17.21",
     "next": "12.1.0",
+    "nextjs-progressbar": "^0.0.16",
     "nouislider-react": "^3.4.1",
     "postcss": "^8.4.49",
     "react": "17.0.2",

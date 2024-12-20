@@ -1,20 +1,45 @@
+import NextNProgress from 'nextjs-progressbar';
+
+import ClientClerkProvider from '@/src/providers/ClerkClientProvider';
 import Head from 'next/head';
-import React, { Fragment, useEffect, useState } from 'react';
-import PreLoader from '../src/components/PreLoader';
-import '../styles/globals.css';
-import '../styles/tailwind-styles.css';
+import { useRouter } from 'next/router';
+import { Fragment, useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
+import PreLoader from '../src/components/PreLoader';
 import config from '../src/config/store';
+import '../styles/globals.css';
+import '../styles/tailwind-styles.css';
+
 const { store, persistor } = config();
 
 const MyApp = ({ Component, pageProps }) => {
-  const [loader, setLoader] = useState(true);
+  const router = useRouter();
+  const [loading, setLoading] = useState(true); // Set initial state to true
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
-    setTimeout(() => {
-      setLoader(false);
-    }, 1000);
-  }, [loader]);
+    setMounted(true);
+    setLoading(false); // Hide loading after initial mount
+
+    const handleRouteChangeStart = () => setLoading(true);
+    const handleRouteChangeComplete = () => setLoading(false);
+    const handleRouteChangeError = () => setLoading(false);
+
+    router.events.on('routeChangeStart', handleRouteChangeStart);
+    router.events.on('routeChangeComplete', handleRouteChangeComplete);
+    router.events.on('routeChangeError', handleRouteChangeError);
+
+    return () => {
+      router.events.off('routeChangeStart', handleRouteChangeStart);
+      router.events.off('routeChangeComplete', handleRouteChangeComplete);
+      router.events.off('routeChangeError', handleRouteChangeError);
+    };
+  }, [router]);
+
+  if (!mounted) {
+    return <PreLoader />;
+  }
 
   return (
     <Fragment>
@@ -30,12 +55,19 @@ const MyApp = ({ Component, pageProps }) => {
           rel='stylesheet'
         />
       </Head>
-      {loader && <PreLoader />}
-      <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
-          <Component {...pageProps} />
-        </PersistGate>
-      </Provider>
+      <NextNProgress />
+
+      {loading && <PreLoader />}
+
+      {/* <ClerkProvider {...pageProps}> */}
+      <ClientClerkProvider>
+        <Provider store={store}>
+          <PersistGate loading={null} persistor={persistor}>
+            <Component {...pageProps} />
+          </PersistGate>
+        </Provider>
+      </ClientClerkProvider>
+      {/* </ClerkProvider> */}
       {/* <Component {...pageProps} /> */}
     </Fragment>
   );
