@@ -13,7 +13,6 @@ const EventDetailModal = ({
   selectedEvent,
   onCloseModal
 }) => {
-  console.log("Event Detail: ", selectedEvent)
   const eventDetailModalRef = useRef(null)
 
   const parseEventDate = (startDate, endDate) => {
@@ -26,8 +25,6 @@ const EventDetailModal = ({
       return `${format(start, 'MMMM d, yyyy h:mmaaa')} – ${format(end, 'MMMM d, yyyy h:mmaaa')}`
     }
   }
-  
-  const { event, eventCreator } = selectedEvent
 
   return (
     <div
@@ -65,17 +62,17 @@ const EventDetailModal = ({
         <div className="flex px-5">
           <div className="flex items-start justify-center">
             {/* Theme Color Rect */}
-            <div className={`mt-0.5 h-3.5 w-3.5 rounded-sm ${colorLookup[event.themeColor]}`}/>
+            <div className={`mt-0.5 h-3.5 w-3.5 rounded-sm ${colorLookup[selectedEvent?.themeColor || 0]}`}/>
           </div>
           <div className="flex flex-col items-start justify-start flex-auto pl-6">
             <span className="text-xl leading-none">
-              {event.title}
+              {selectedEvent?.eventTitle}
             </span>
             <span className="pt-2 text-xs font-normal text-gray-500">
               {
                 parseEventDate(
-                  event.startDate,
-                  event.endDate
+                  selectedEvent?.eventStartDate,
+                  selectedEvent?.eventEndDate
                 )
               }
             </span>
@@ -86,7 +83,7 @@ const EventDetailModal = ({
             <MdToday size="20px" color="gray" />
           </div>
           <div className="flex items-start justify-start flex-auto pl-5 text-xs text-gray-500">
-            {eventCreator.displayName}
+            {selectedEvent?.eventCreator?.displayName}
           </div>
         </div>
       </div>

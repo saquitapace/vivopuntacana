@@ -29,7 +29,6 @@ const CalendarLayout = ({ children }) => {
       <div className='flex flex-1'>
         <PanelLeft />
         <div className='relative flex-auto'>{children}</div>
-        <PanelRight />
       </div>
       {isCreateEventModalOpen && <CreateEventModal />}
       {isEditModalOpen && <CreateEventModal isEdit />}

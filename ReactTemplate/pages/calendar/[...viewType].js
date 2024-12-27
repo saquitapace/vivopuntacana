@@ -1,17 +1,18 @@
+import { useUser } from '@clerk/nextjs';
 import Head from 'next/head';
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchEventsForCalendarType } from '../../src/reducers/calendar/calendarSlice';
-import CalendarLayout from '../../src/components/Calendar/CalendarLayout';
-import TimelineWrapper from '../../src/components/Calendar/CalendarView/Timeline/TimelineWrapper';
 import { useRouter } from 'next/router';
-import { CalendarViewTypes } from '../../src/utils/types';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import CalendarLayout from '../../src/components/Calendar/CalendarLayout';
+import CalendarViewGrid from '../../src/components/Calendar/CalendarView/Grid/Grid';
+import TimelineWrapper from '../../src/components/Calendar/CalendarView/Timeline/TimelineWrapper';
+import EventDetailModal from '../../src/components/Modal/EventDetailModal';
 import {
   setSelectedEvent,
   setViewType,
 } from '../../src/reducers/calendar/calendarSettingSlice';
-import CalendarViewGrid from '../../src/components/Calendar/CalendarView/Grid/Grid';
-import EventDetailModal from '../../src/components/Modal/EventDetailModal';
+import { fetchEvents } from '../../src/reducers/calendar/calendarSlice';
+import { CalendarViewTypes } from '../../src/utils/types';
 
 const CalendarView = () => {
   const dispatch = useDispatch();
@@ -23,12 +24,14 @@ const CalendarView = () => {
     (state) => state.calendarSetting
   );
 
-  const user = useSelector((state) => state.user);
-  const userDB = useSelector((state) => state.db.db.userDB);
-  const eventDB = useSelector((state) => state.db.db.eventDB);
-  const userEventDB = useSelector((state) => state.db.db.userEventDB);
-  const invitedDB = useSelector((state) => state.db.db.invitedDB);
-  const eventGroupDB = useSelector((state) => state.db.db.eventGroupDB);
+  // const user = useSelector((state) => state.user);
+  const {isLoaded , isSignedIn , user}  = useUser()
+
+  useEffect(() => {
+    if (isLoaded && isSignedIn && user?.id) {
+      dispatch(fetchEvents(user?.id, calendarViewType, targetDate));
+    }
+  }, [dispatch, user?.id, calendarViewType, targetDate]);
 
   const dayQueryLookUp = {
     day: CalendarViewTypes.DAY_VIEW,
@@ -64,38 +67,8 @@ const CalendarView = () => {
   };
 
   useEffect(() => {
-    if (targetDate) {
-      console.log('Fetching Data...', targetDate, calendarViewType);
-      dispatch(
-        fetchEventsForCalendarType({
-          userUid: user.userUid,
-          calendarViewType,
-          targetDate,
-          db: {
-            userEventDB,
-            eventDB,
-            invitedDB,
-            eventGroupDB,
-          },
-        })
-      );
-    } else {
-      router.push('/calendar/day', undefined, { shallow: true });
-    }
-  }, [
-    user?.userUid,
-    targetDate,
-    calendarViewType,
-    userEventDB,
-    eventDB,
-    invitedDB,
-    eventGroupDB,
-  ]);
-
-  useEffect(() => {
     const viewType = query.viewType || [];
     if (viewType.length > 0) {
-      console.log(viewType);
       if (
         viewType[0] in dayQueryLookUp &&
         calendarViewType !== dayQueryLookUp[viewType[0]]
@@ -133,21 +106,20 @@ const CalendarView = () => {
             {selectedCalendarView(calendarViewType)}
           </div>
           {/* Event Detail Modal */}
-          {selectedEvent.eventUid.length > 0 &&
-            selectedEvent.eventUid in eventDB && (
-              <>
-                <div className='absolute top-0 left-0 w-full h-full z-1' />
-                <EventDetailModal
-                  selectedEvent={{
-                    ...selectedEvent,
-                    event: eventDB[selectedEvent.eventUid],
-                    eventCreator:
-                      userDB[eventDB[selectedEvent.eventUid].eventCreatorUid],
-                  }}
-                  onCloseModal={onCloseEventDetailModal}
-                />
-              </>
-            )}
+          {selectedEvent.eventUid.length > 0 && (
+            <>
+              <div className='absolute top-0 left-0 w-full h-full z-1' />
+              <EventDetailModal
+                selectedEvent={{
+                  ...selectedEvent,
+                  
+                  eventCreator: user,
+
+                }}
+                onCloseModal={onCloseEventDetailModal}
+              />
+            </>
+          )}
         </CalendarLayout>
       </main>
     </>

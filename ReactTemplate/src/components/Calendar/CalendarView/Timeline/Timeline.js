@@ -6,7 +6,6 @@ const Timeline = ({ calendarViewType, data = {}, onClickTimelineBlock }) => {
     return Object.keys(data).map((h, i) => {
       const minuteSegments = Object.keys(data[h]).map((seg) => {
         const { events, startColIndex, colCount, baseZIndex } = data[h][seg];
-
         return (
           <div
             key={`${h}-${seg}`}
@@ -41,7 +40,6 @@ const Timeline = ({ calendarViewType, data = {}, onClickTimelineBlock }) => {
   };
 
   const weekViewTimeline = (data) => {
-    console.log('Week Data', data);
     const week = Object.keys(data['days']).map((d, i) => {
       const dayView = dayViewTimeline(data['days'][d]);
       return (

@@ -9,8 +9,10 @@ import { addDays, addMonths, addWeeks, addYears, endOfWeek, format, isSameMonth,
 import { setTargetDate, setViewType } from '../../reducers/calendar/calendarSettingSlice';
 import Dropdown from '../Common/Dropdown/Dropdown';
 import UserProfileModal from '../Modal/UserProfile';
+import { UserButton, useUser } from '@clerk/nextjs';
 
 export const HeaderBar = () => {
+  const {} = useUser()
   const { photoUrl = '' } = useSelector(state => state.user);
   const { targetDate, calendarViewType } = useSelector(state => state.calendarSetting);
   
@@ -145,22 +147,11 @@ export const HeaderBar = () => {
     <div className="flex w-full p-2 border-b">
       {/* Left Section */}
       <div className="flex items-center justify-start pl-2 mr-12 text-2xl">
-        <div className="p-1 ml-1 mr-2">
-          <IconButton
-            size="medium"
-            label="Menu"
-            tooltipLocation="bottom"
-            imgComponent={
-              <MdMenu size="24px" color="rgba(75, 85, 99)"/>
-            }
-            onClickHandler={() => {}}
-          />
-        </div>
         <div
           className="flex items-center justify-center"
         >
           <Image src="/google-calender.png" height="32px" width="32px" alt="mail-icon"/>
-          <p className="ml-4 font-normal text-gray-500">Kalendar</p>
+          <p className="ml-4 font-normal text-gray-500">Fioxen</p>
         </div>
       </div>
 
@@ -202,15 +193,7 @@ export const HeaderBar = () => {
       {/* Right Section */}
       <div className="relative flex items-center justify-end pl-6 pr-2">
         <div className="flex items-center justify-center mr-8 space-x-3">
-          <IconButton
-            size="medium"
-            label="Apps"
-            tooltipLocation="bottom"
-            imgComponent={
-              <MdHelpOutline size="24px" color="rgba(75, 85, 99)" />
-            }
-            onClickHandler={() => {}}
-          />
+         
           <div
             className="relative flex items-center justify-between text-sm tracking-wide text-gray-800 border rounded-md cursor-pointer hover:bg-gray-100"
           >
@@ -236,35 +219,10 @@ export const HeaderBar = () => {
           </div>
         </div>
         <div className="flex space-x-2">
-          <IconButton
-            size="medium"
-            label="Apps"
-            tooltipLocation="bottom"
-            imgComponent={
-              <MdApps size="24px" color="rgba(75, 85, 99)" />
-            }
-            onClickHandler={() => {}}
-          />
-          <IconButton
-            size="medium"
-            label="Profile"
-            tooltipLocation="none"
-            imgComponent={
-              <Image
-                src={profilePhoto}
-                alt="Profile Picture"
-                width="32px"
-                height="32px"
-                className="z-10 flex items-center justify-center rounded-full"
-              />
-            }
-            onClickHandler={() => setIsUserProfileOpen(true)}
-          />
+          
+         
         </div>
-        {
-          isUserProfileOpen &&
-          <UserProfileModal onCloseUserProfile={() => setIsUserProfileOpen(false)}/>
-        }
+       <UserButton/>
       </div>
     </div>
   )

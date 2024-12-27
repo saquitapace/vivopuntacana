@@ -1,45 +1,33 @@
 import { createSlice } from '@reduxjs/toolkit';
 import {
-  isBefore,
-  isWithinInterval,
-  eachDayOfInterval,
   areIntervalsOverlapping,
-  getHours,
-  set,
-  format,
-  closestTo,
-  getMinutes,
-  getMonth,
-  getDate,
-  isWeekend,
-  differenceInWeeks,
-  isSameDay,
-  differenceInMonths,
-  getDay,
-  isAfter,
+  eachDayOfInterval,
   eachWeekOfInterval,
-  intervalToDuration,
-  endOfWeek,
   endOfDay,
-  getYear,
-  getSeconds,
+  endOfMonth,
+  endOfWeek,
+  getDate,
+  getDay,
+  getMonth,
+  isAfter,
+  isBefore,
+  isSameDay,
+  isWithinInterval,
+  startOfDay,
+  startOfMonth,
+  startOfWeek
 } from 'date-fns';
 import {
-  calculateIncomingRowMatrix,
   calculateOverlap,
   findEventCoverage,
   getBaseDayViewEvents,
   getBaseMonthViewEvents,
   getBaseWeekViewEvents,
   getClosestIndexForDayViewEvents,
-  getDateRange,
-  reduceCoverages,
+  reduceCoverages
 } from '../../utils/helpers';
 import {
-  CalendarViewTypes,
-  EventRepeatTypes,
-  MINUTE_SEGMENT_KEYS,
-  RepeatChangesTypes,
+  CalendarViewTypes
 } from '../../utils/types';
 
 const initialState = {
@@ -64,35 +52,14 @@ const getBaseEventContainer = (calendarViewType, targetDate) => {
   }
 };
 
-const getBaseEventBlock = (
-  event,
-  changes = {},
-  start = null,
-  end = null,
-  duration = -1
-) => {
-  const {
-    eventUid,
-    eventCreatorUid,
-    eventGroupUid,
-    title,
-    themeColor,
-    createdAt,
-    startDate,
-    endDate,
-  } = event;
-
+const getBaseEventBlock = (event, start = null, end = null) => {
   return {
-    eventUid,
-    eventCreatorUid,
-    eventGroupUid,
-    startDate: start !== null ? start : startDate,
-    endDate: end !== null ? end : endDate,
-    title,
-    themeColor,
-    duration,
-    createdAt,
-    ...changes,
+    eventUid: event.eventUid,
+    eventTitle: event.eventTitle,
+    eventDescription: event.eventDescription,
+    eventStartDate: start || event.eventStartDate,
+    eventEndDate: end || event.eventEndDate,
+    eventLocation: event.eventLocation,
   };
 };
 
@@ -107,8 +74,8 @@ const getMultidayEventBlocksForMonth = (events, rangeStart, rangeEnd) => {
   const processedEvents = [];
 
   events.forEach((event) => {
-    const originalStartDate = new Date(event.startDate);
-    const originalEndDate = new Date(event.endDate);
+    const originalStartDate = new Date(event.eventStartDate);
+    const originalEndDate = new Date(event.eventEndDate);
 
     // Check if start date is within bounds
     const startDate = isBefore(originalStartDate, rangeStart)
@@ -133,10 +100,8 @@ const getMultidayEventBlocksForMonth = (events, rangeStart, rangeEnd) => {
       processedEvents.push(
         getBaseEventBlock(
           event,
-          {},
           startDate.toString(),
-          endDate.toString(),
-          getDuration(startDate, endDate)
+          endDate.toString()
         )
       );
 
@@ -149,10 +114,8 @@ const getMultidayEventBlocksForMonth = (events, rangeStart, rangeEnd) => {
           processedEvents.push(
             getBaseEventBlock(
               event,
-              {},
               interval.toString(),
-              endDate.toString(),
-              getDuration(interval, endDate)
+              endDate.toString()
             )
           );
 
@@ -165,10 +128,8 @@ const getMultidayEventBlocksForMonth = (events, rangeStart, rangeEnd) => {
           processedEvents.push(
             getBaseEventBlock(
               event,
-              {},
               startDate.toString(),
-              endOfTargetWeek.toString(),
-              getDuration(startDate, endOfTargetWeek)
+              endOfTargetWeek.toString()
             )
           );
 
@@ -181,10 +142,8 @@ const getMultidayEventBlocksForMonth = (events, rangeStart, rangeEnd) => {
           processedEvents.push(
             getBaseEventBlock(
               event,
-              {},
               interval.toString(),
-              endOfTargetWeek.toString(),
-              MAX_DURATION
+              endOfTargetWeek.toString()
             )
           );
         }
@@ -196,278 +155,62 @@ const getMultidayEventBlocksForMonth = (events, rangeStart, rangeEnd) => {
   return processedEvents;
 };
 
-const getRepeatedEventBlocks = (
-  sourceEvent,
-  eventGroupDetail,
-  rangeStart,
-  rangeEnd
-) => {
-  console.log(eventGroupDetail);
-
-  const intervalStart = isBefore(new Date(sourceEvent.startDate), rangeStart)
-    ? rangeStart
-    : new Date(sourceEvent.startDate);
-
-  const rangeInterval = eachDayOfInterval({
-    start: intervalStart,
-    end: rangeEnd,
-  });
-  const { repeatChanges, repeatType } = eventGroupDetail;
-  const eventBlockList = [];
-
-  // Loop through the days within the interval to create repeated blocks
-  for (let i = 0; i < rangeInterval.length; i++) {
-    const changeDateKey = format(rangeInterval[i], 'yyyy-M-d');
-    let changePayload = {};
-
-    // Check whether there is a change in date for repeated event
-    if (changeDateKey in repeatChanges) {
-      console.log(changeDateKey, 'exists');
-
-      if (repeatChanges[changeDateKey].type === RepeatChangesTypes.DELETE) {
-        continue;
-      } else {
-        changePayload = { ...repeatChanges[changeDateKey].payload };
-      }
-    }
-
-    const curYear = getYear(rangeInterval[i]);
-    const curMonth = getMonth(rangeInterval[i]);
-    const curDate = getDate(rangeInterval[i]);
-
-    const blockStart = set(new Date(sourceEvent.startDate), {
-      year: curYear,
-      month: curMonth,
-      date: curDate,
-    });
-    const blockEnd = set(new Date(sourceEvent.endDate), {
-      year: curYear,
-      month: curMonth,
-      date: curDate,
-    });
-
-    switch (repeatType) {
-      case EventRepeatTypes.DAILY: {
-        const eventBlock = getBaseEventBlock(
-          sourceEvent,
-          changePayload,
-          blockStart.toString(),
-          blockEnd.toString()
-        );
-        eventBlockList.push(eventBlock);
-        break;
-      }
-      case EventRepeatTypes.WEEKLY: {
-        const checkIsSameDay = isSameDay(
-          rangeInterval[i],
-          new Date(sourceEvent.startDate)
-        );
-        const checkIsSameWeekDay =
-          getDay(rangeInterval[i]) === getDay(new Date(sourceEvent.startDate));
-
-        const sourceHour = getHours(new Date(sourceEvent.startDate));
-        const sourceMinute = getMinutes(new Date(sourceEvent.startDate));
-        const sourceSeconds = getSeconds(new Date(sourceEvent.startDate));
-
-        const checkDifferenceInWeeks = differenceInWeeks(
-          set(rangeInterval[i], {
-            hours: sourceHour,
-            minutes: sourceMinute,
-            seconds: sourceSeconds + 1,
-          }),
-          new Date(sourceEvent.startDate)
-        );
-
-        console.log(checkIsSameDay, checkIsSameWeekDay, checkDifferenceInWeeks);
-        if (
-          checkIsSameDay ||
-          (checkIsSameWeekDay && checkDifferenceInWeeks > 0)
-        ) {
-          const eventBlock = getBaseEventBlock(
-            sourceEvent,
-            changePayload,
-            blockStart.toString(),
-            blockEnd.toString()
-          );
-          eventBlockList.push(eventBlock);
-        }
-        break;
-      }
-      case EventRepeatTypes.BI_WEEKLY: {
-        const checkIsSameDay = isSameDay(
-          rangeInterval[i],
-          new Date(sourceEvent.startDate)
-        );
-        const checkIsSameWeekDay = getDay(
-          rangeInterval[i],
-          new Date(sourceEvent.startDate)
-        );
-
-        const sourceHour = getHours(new Date(sourceEvent.startDate));
-        const sourceMinute = getMinutes(new Date(sourceEvent.startDate));
-        const sourceSeconds = getSeconds(new Date(sourceEvent.startDate));
-
-        const checkDifferenceInWeeks = differenceInWeeks(
-          set(rangeInterval[i], {
-            hours: sourceHour,
-            minutes: sourceMinute,
-            seconds: sourceSeconds + 1,
-          }),
-          new Date(sourceEvent.startDate)
-        );
-
-        if (
-          checkIsSameDay ||
-          (checkIsSameWeekDay && checkDifferenceInWeeks % 2 === 0)
-        ) {
-          const eventBlock = getBaseEventBlock(
-            sourceEvent,
-            changePayload,
-            blockStart.toString(),
-            blockEnd.toString()
-          );
-          eventBlockList.push(eventBlock);
-        }
-        break;
-      }
-      case EventRepeatTypes.MONTHLY: {
-        const checkIsSameDay = isSameDay(
-          rangeInterval[i],
-          new Date(sourceEvent.startDate)
-        );
-        const checkIsSameWeekDay = getDay(
-          rangeInterval[i],
-          new Date(sourceEvent.startDate)
-        );
-
-        const sourceMonth = getMonth(new Date(sourceEvent.startDate));
-        const sourceHour = getHours(new Date(sourceEvent.startDate));
-        const sourceMinute = getMinutes(new Date(sourceEvent.startDate));
-        const sourceSeconds = getSeconds(new Date(sourceEvent.startDate));
-
-        const checkDifferenceInMonths = differenceInMonths(
-          set(rangeInterval[i], {
-            hours: sourceHour,
-            minutes: sourceMinute,
-            seconds: sourceSeconds + 1,
-          }),
-          new Date(sourceEvent.startDate)
-        );
-
-        if (
-          checkIsSameDay ||
-          (checkIsSameWeekDay && checkDifferenceInMonths > 0)
-        ) {
-          const eventBlock = getBaseEventBlock(
-            sourceEvent,
-            changePayload,
-            blockStart.toString(),
-            blockEnd.toString()
-          );
-          eventBlockList.push(eventBlock);
-        }
-        break;
-      }
-      case EventRepeatTypes.WEEK_DAYS: {
-        if (!isWeekend(rangeInterval[i])) {
-          const eventBlock = getBaseEventBlock(
-            sourceEvent,
-            changePayload,
-            blockStart.toString(),
-            blockEnd.toString()
-          );
-          eventBlockList.push(eventBlock);
-        }
-        break;
-      }
-    }
-  }
-
-  return eventBlockList;
-};
-
 const insertEventToDayViewContainer = (
   container,
   filteredEvents,
-  targetDate,
-  eventGroupDB
+  targetDate
 ) => {
-  console.log('Day View Container', container);
-  console.log('Events', filteredEvents);
-  console.log('eventGroupDB', eventGroupDB);
-
-  const { single, repeated, multiday } = filteredEvents;
-  const [rangeStart, rangeEnd] = getDateRange(
-    CalendarViewTypes.DAY_VIEW,
-    targetDate
-  );
 
   const coverageArr = [];
 
   // Process Single Events
-  single.forEach((e) => {
-    const [hour, minute] = getClosestIndexForDayViewEvents(
-      new Date(e.startDate)
-    );
-    const eventBlock = getBaseEventBlock(e);
-    container['hours'][hour][minute]['events'].push(eventBlock);
+  filteredEvents.forEach((e) => {
+    const eventStart = new Date(e.eventStartDate);
+    const eventEnd = new Date(e.eventEndDate);
 
-    coverageArr.push(findEventCoverage(e));
+    // Skip invalid events
+    if (isAfter(eventStart, eventEnd)) {
+      return;
+    }
+
+    // Get the hour and minute indices for event start time
+    const [startHour, startMinute] = getClosestIndexForDayViewEvents(eventStart);
+
+    // Ensure the hour exists in container
+    if (container.hours[startHour] && container.hours[startHour][startMinute]) {
+      const eventBlock = getBaseEventBlock(e);
+      container.hours[startHour][startMinute].events.push(eventBlock);
+
+      try {
+        const coverage = findEventCoverage(e);
+        if (coverage) {
+          coverageArr.push(coverage);
+        }
+      } catch (error) {
+        console.error('Error calculating coverage for event:', e, error);
+      }
+    } else {
+      console.warn('Invalid hour/minute slot:', startHour, startMinute);
+    }
   });
-  // Process Multiday Events
-  multiday.forEach((e) => {
-    const eventBlock = getBaseEventBlock(e);
-    container['wholeDayEvents'].push(eventBlock);
-  });
-
-  // Process Repeated Events
-  repeated.forEach((e) => {
-    const eventGroupDetail = eventGroupDB[e.eventGroupUid];
-    const repeatedBlocks = getRepeatedEventBlocks(
-      e,
-      eventGroupDetail,
-      rangeStart,
-      rangeEnd
-    );
-
-    repeatedBlocks.forEach((block) => {
-      // TODO: Additional Check for blocks that may have changed dates*
-      // - CHECK start & end-dates
-      // - CHECK duration -> if duration > -1 || isAllDay, then multiday event
-
-      const [hour, minute] = getClosestIndexForDayViewEvents(
-        new Date(block.startDate)
-      );
-      container['hours'][hour][minute]['events'].push(block);
-
-      coverageArr.push(findEventCoverage(e));
-    });
-  });
-
-  console.log('Coverage Arr:', coverageArr);
 
   if (coverageArr.length > 0) {
-    const coverages = reduceCoverages(coverageArr);
-    calculateOverlap(coverages, container['hours']);
+    try {
+      const coverages = reduceCoverages(coverageArr);
+      calculateOverlap(coverages, container.hours);
+    } catch (error) {
+      console.error('Error calculating overlap:', error);
+    }
   }
+
+  return container;
 };
 
 const insertEventToWeekViewContainer = (
   container,
   filteredEvents,
-  targetDate,
-  eventGroupDB
+  targetDate
 ) => {
-  console.log('Week View Container', container);
-  console.log('Events', filteredEvents);
-  console.log('eventGroupDB', eventGroupDB);
-
-  const { single, repeated, multiday } = filteredEvents;
-  const [rangeStart, rangeEnd] = getDateRange(
-    CalendarViewTypes.WEEK_VIEW,
-    targetDate
-  );
-
   const coverageArrs = {
     0: [],
     1: [],
@@ -479,252 +222,113 @@ const insertEventToWeekViewContainer = (
   };
 
   // Process Single Events
-  single.forEach((e) => {
-    const dayIndex = getDay(new Date(e.startDate));
+  filteredEvents.forEach((e) => {
+    const dayIndex = getDay(new Date(e.eventStartDate));
     const [hour, minute] = getClosestIndexForDayViewEvents(
-      new Date(e.startDate)
+      new Date(e.eventStartDate)
     );
     const eventBlock = getBaseEventBlock(e);
-    container['days'][dayIndex][hour][minute]['events'].push(eventBlock);
+    container.days[dayIndex][hour][minute].events.push(eventBlock);
 
     coverageArrs[dayIndex].push(findEventCoverage(e));
-  });
-  // Process Multiday Events
-  multiday.forEach((e) => {
-    const originalStartDate = new Date(e.startDate);
-    const originalEndDate = new Date(e.endDate);
-
-    // Check if start date is within bounds
-    const startDate = isBefore(originalStartDate, rangeStart)
-      ? rangeStart
-      : originalStartDate;
-
-    // Check if end date is within bounds
-    const endDate = isAfter(originalEndDate, rangeEnd)
-      ? rangeEnd
-      : originalEndDate;
-
-    const dayIndex = getDay(new Date(startDate));
-    const duration = getDuration(startDate, endDate);
-
-    const eventBlock = getBaseEventBlock(e, {}, null, null, duration);
-    container['wholeDayEvents'][dayIndex]['events'].push(eventBlock);
-  });
-
-  // Process Repeated Events
-  repeated.forEach((e) => {
-    // TODO: Additional Check for blocks that may have changed dates*
-    // - CHECK start & end-dates
-    // - CHECK duration -> if duration > -1 || isAllDay, then multiday event
-
-    const eventGroupDetail = eventGroupDB[e.eventGroupUid];
-    const repeatedBlocks = getRepeatedEventBlocks(
-      e,
-      eventGroupDetail,
-      rangeStart,
-      rangeEnd
-    );
-
-    console.log('Repeated Blocks:', repeatedBlocks);
-
-    repeatedBlocks.forEach((block) => {
-      const dayIndex = getDay(new Date(block.startDate));
-      const [hour, minute] = getClosestIndexForDayViewEvents(
-        new Date(block.startDate)
-      );
-      container['days'][dayIndex][hour][minute]['events'].push(block);
-
-      coverageArrs[dayIndex].push(findEventCoverage(e));
-    });
   });
 
   Object.keys(coverageArrs).forEach((key) => {
     if (coverageArrs[key].length > 0) {
       coverageArrs[key] = reduceCoverages(coverageArrs[key]);
-      calculateOverlap(coverageArrs[key], container['days'][key]);
+      calculateOverlap(coverageArrs[key], container.days[key]);
     }
   });
+
+  return container;
 };
 
 const insertEventToMonthViewContainer = (
   container,
   filteredEvents,
-  targetDate,
-  eventGroupDB
+  targetDate
 ) => {
-  console.log('Month View Container', container);
-  console.log('Events', filteredEvents);
-  console.log('eventGroupDB', eventGroupDB);
-
-  const { single, repeated, multiday } = filteredEvents;
-  const [rangeStart, rangeEnd] = getDateRange(
-    CalendarViewTypes.MONTH_VIEW,
-    targetDate
-  );
 
   // Process Single Events
-  single.forEach((e) => {
-    const startDate = new Date(e.startDate);
+  filteredEvents.forEach((e) => {
+    const startDate = new Date(e.eventStartDate);
     const monthIndex = getMonth(startDate);
     const dateIndex = getDate(startDate);
 
     const eventBlock = getBaseEventBlock(e);
-    container[monthIndex][dateIndex]['events'].push(eventBlock);
+    container[monthIndex][dateIndex].events.push(eventBlock);
   });
 
   // Process Multiday Events
   const multidayEventBlocks = getMultidayEventBlocksForMonth(
-    multiday,
-    rangeStart,
-    rangeEnd
+    filteredEvents,
+    startOfMonth(targetDate),
+    endOfMonth(targetDate)
   );
 
   multidayEventBlocks.forEach((eb) => {
-    const startDate = new Date(eb.startDate);
+    const startDate = new Date(eb.eventStartDate);
     const monthIndex = getMonth(startDate);
     const dateIndex = getDate(startDate);
 
-    container[monthIndex][dateIndex]['events'].push(eb);
+    container[monthIndex][dateIndex].events.push(eb);
   });
 
-  // Process Repeated Events
-  repeated.forEach((e) => {
-    const eventGroupDetail = eventGroupDB[e.eventGroupUid];
-    const repeatedBlocks = getRepeatedEventBlocks(
-      e,
-      eventGroupDetail,
-      rangeStart,
-      rangeEnd
-    );
-    console.log('Repeated Blocks:', repeatedBlocks);
-    repeatedBlocks.forEach((block) => {
-      const startDate = new Date(block.startDate);
-      const monthIndex = getMonth(startDate);
-      const dateIndex = getDate(startDate);
-
-      container[monthIndex][dateIndex]['events'].push(block);
-    });
-  });
+  return container;
 };
 
-const filterEvents = (events, calendarViewType, targetDate) => {
-  const [rangeStart, rangeEnd] = getDateRange(calendarViewType, targetDate);
+const filterEvents = (events, targetDate) => {
+  if (!events || !targetDate) return [];
 
-  const filteredEvents = {
-    single: [],
-    multiday: [],
-    repeated: [],
-  };
+  const targetDateStart = startOfDay(new Date(targetDate));
+  const targetDateEnd = endOfDay(new Date(targetDate));
 
-  events.forEach((e) => {
-    const eventStartDate = new Date(e.startDate);
-    const eventEndDate = new Date(e.endDate);
+  return events.filter((event) => {
+    const eventStart = new Date(event.eventStartDate);
+    const eventEnd = new Date(event.eventEndDate);
 
-    const isWithin = isWithinInterval(eventStartDate, {
-      start: rangeStart,
-      end: rangeEnd,
-    });
+    const isInRange = areIntervalsOverlapping(
+      { start: eventStart, end: eventEnd },
+      { start: targetDateStart, end: targetDateEnd }
+    );
 
-    // Check if event is a repeated event
-    if (e.eventGroupUid && isBefore(eventStartDate, rangeEnd)) {
-      filteredEvents.repeated.push(e);
-
-      // Check if event is a multiday event
-    } else if (
-      (e.isAllDay && isWithin) ||
-      (eachDayOfInterval({ start: eventStartDate, end: eventEndDate }).length >
-        1 &&
-        areIntervalsOverlapping(
-          { start: eventStartDate, end: eventEndDate },
-          { start: rangeStart, end: rangeEnd }
-        ))
-    ) {
-      filteredEvents.multiday.push(e);
-
-      // Check if event is a single event within date range
-    } else if (isWithin) {
-      filteredEvents.single.push(e);
-    }
+    return isInRange;
   });
-
-  return filteredEvents;
 };
 
 export const calendarSlice = createSlice({
   name: 'event',
   initialState,
   reducers: {
-    fetchEventsForCalendarType: (state, { payload }) => {
-      const { userUid, calendarViewType, targetDate, db } = payload;
-      const { userEventDB, eventDB, invitedDB, eventGroupDB } = db;
+    setCalendarEvents: (state, { payload }) => {
+      const { events, calendarViewType, targetDate } = payload;
 
-      const allEvents = [
-        ...userEventDB[userUid]?.map((eUid) => eventDB[eUid]),
-        ...invitedDB[userUid],
-      ];
-
-      /*
-        single, multiday, repeated
-      */
-      const filteredEvents = filterEvents(
-        allEvents,
-        calendarViewType,
-        targetDate
-      );
-      const baseEventContainer = getBaseEventContainer(
-        calendarViewType,
-        targetDate
-      );
-      console.log(
-        'Filtered Events & Base Event Container',
-        filteredEvents,
-        baseEventContainer
-      );
-
+      const filteredEvents = filterEvents(events, targetDate);
+      const baseEventContainer = getBaseEventContainer(calendarViewType, targetDate);
+      
       switch (calendarViewType) {
-        case CalendarViewTypes.DAY_VIEW: {
-          insertEventToDayViewContainer(
+        case CalendarViewTypes.DAY_VIEW:
+          state.dayViewEvents = insertEventToDayViewContainer(
             baseEventContainer,
             filteredEvents,
-            targetDate,
-            eventGroupDB
+            targetDate
           );
-
-          state.dayViewEvents = baseEventContainer;
           break;
-        }
-
-        case CalendarViewTypes.WEEK_VIEW: {
-          insertEventToWeekViewContainer(
+        case CalendarViewTypes.WEEK_VIEW:
+          state.weekViewEvents = insertEventToWeekViewContainer(
             baseEventContainer,
             filteredEvents,
-            targetDate,
-            eventGroupDB
+            targetDate
           );
-
-          // Calculate incoming row count
-          baseEventContainer['wholeDayEvents'] = calculateIncomingRowMatrix(
-            baseEventContainer['wholeDayEvents'],
-            true
-          );
-
-          state.weekViewEvents = baseEventContainer;
           break;
-        }
-
-        case CalendarViewTypes.MONTH_VIEW: {
-          insertEventToMonthViewContainer(
+        case CalendarViewTypes.MONTH_VIEW:
+          state.monthViewEvents = insertEventToMonthViewContainer(
             baseEventContainer,
             filteredEvents,
-            targetDate,
-            eventGroupDB
+            targetDate
           );
-          state.monthViewEvents = baseEventContainer;
           break;
-        }
       }
-
-      console.log('Updated Container', baseEventContainer);
     },
     resetCalendarEvents: (state) => {
       state.dayViewEvents = {};
@@ -734,7 +338,44 @@ export const calendarSlice = createSlice({
   },
 });
 
-export const { fetchEventsForCalendarType, resetCalendarEvents } =
-  calendarSlice.actions;
+export const { setCalendarEvents, resetCalendarEvents } = calendarSlice.actions;
+
+// Thunk action to fetch events from API
+export const fetchEvents = (userUid, calendarViewType, targetDate) => async (dispatch) => {
+  try {
+    const response = await fetch(`/api/calendar?userId=${userUid}`);
+    const data = await response.json();
+    dispatch(setCalendarEvents({
+      events: data.events,
+      calendarViewType,
+      targetDate,
+    }));
+  } catch (error) {
+    console.error('Error fetching events:', error);
+  }
+};
+
+// Thunk action to create new event
+export const createEvent = (userUid, event , calendarViewType , targetDate) => async (dispatch) => {
+  try {
+    const response = await fetch('/api/calendar', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userUid,
+        event,
+      }),
+    });
+    
+    if (response.ok) {
+      // Refresh events after creating new one
+      dispatch(fetchEvents(userUid, calendarViewType || 0, targetDate || Date()));
+    }
+  } catch (error) {
+    console.error('Error creating event:', error);
+  }
+};
 
 export default calendarSlice.reducer;

@@ -32,7 +32,6 @@ export default function Home() {
 
   useEffect(() => {
     if (!isDBLoaded) {
-      console.log('Load DB Data');
       dispatch(
         setDB({
           userDB: getInitialUsers(),

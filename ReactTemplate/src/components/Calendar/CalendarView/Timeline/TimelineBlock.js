@@ -19,10 +19,10 @@ const TimelineBlock = ({
     if (!isMultiday) {
       const basePixel = 11;
       const [startHour, startMinuteSeg] = getClosestIndexForDayViewEvents(
-        new Date(event.startDate)
+        new Date(event.eventStartDate)
       );
       const [endHour, endMinuteSeg] = getClosestIndexForDayViewEvents(
-        new Date(event.endDate)
+        new Date(event.eventEndDate)
       );
 
       if (startHour === endHour && startMinuteSeg === endMinuteSeg) {
@@ -50,12 +50,12 @@ const TimelineBlock = ({
   const blockSubtitle = (blockHeight, isMultiday) => {
     if (!isMultiday) {
       if (blockHeight > 22) {
-        const startTime = format(new Date(event.startDate), 'K:mm aaa');
-        const endTime = format(new Date(event.endDate), 'K:mm aaa');
+        const startTime = format(new Date(event?.eventStartDate), 'K:mm aaa');
+        const endTime = format(new Date(event?.eventEndDate), 'K:mm aaa');
 
         return <div className='pt-0.5'>{`${startTime} - ${endTime}`}</div>;
       } else {
-        return `, ${format(new Date(event.startDate), 'K aaa')}`;
+        return `, ${format(new Date(event.eventStartDate), 'K aaa')}`;
       }
     }
   };
@@ -65,6 +65,7 @@ const TimelineBlock = ({
       timelineBlockRef.current.getBoundingClientRect();
 
     onClickTimelineBlock({
+      ...event,
       eventUid: event.eventUid,
       top: top - 65,
       left: left - 248,
@@ -88,7 +89,7 @@ const TimelineBlock = ({
         px-2.5
         pt-0.5
         cursor-pointer
-        ${colorLookup[event.themeColor]}
+        ${colorLookup[event?.themeColor || 0]}
         ${`z-${1 + baseZIndex + index}`}
         ${startColIndex > 0 ? 'border border-white' : ''}
         ${!isMultiday && index > 0 && 'border-l border-white -ml-2'}
@@ -96,7 +97,8 @@ const TimelineBlock = ({
       onClick={() => handleOnClickBlock()}
     >
       <div className='absolute min-w-0 font-normal truncate'>
-        {`${event.title}`}
+        {`${event.eventTitle}`}
+        <h1>fuck you</h1>
         {blockSubtitle(getBlockHeight(event), isMultiday)}
       </div>
     </div>

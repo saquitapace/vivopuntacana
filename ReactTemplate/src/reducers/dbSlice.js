@@ -27,9 +27,6 @@ export const dbSlice = createSlice({
         eventGroup
       } = action.payload
 
-      console.log("Adding Event to DB...")
-      console.log(userUid, event, eventGroup)
-
       state.db.eventDB[event.eventUid] = event
       state.db.userEventDB[userUid].push(event.eventUid)
 

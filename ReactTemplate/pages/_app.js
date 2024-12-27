@@ -5,22 +5,21 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { Fragment, useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
 import PreLoader from '../src/components/PreLoader';
 import config from '../src/config/store';
 import '../styles/globals.css';
 import '../styles/tailwind-styles.css';
 
-const { store, persistor } = config();
+const store = config();
 
 const MyApp = ({ Component, pageProps }) => {
   const router = useRouter();
-  const [loading, setLoading] = useState(true); // Set initial state to true
+  const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    setLoading(false); // Hide loading after initial mount
+    setLoading(false);
 
     const handleRouteChangeStart = () => setLoading(true);
     const handleRouteChangeComplete = () => setLoading(false);
@@ -59,17 +58,13 @@ const MyApp = ({ Component, pageProps }) => {
 
       {loading && <PreLoader />}
 
-      {/* <ClerkProvider {...pageProps}> */}
       <ClientClerkProvider>
         <Provider store={store}>
-          <PersistGate loading={null} persistor={persistor}>
-            <Component {...pageProps} />
-          </PersistGate>
+          <Component {...pageProps} />
         </Provider>
       </ClientClerkProvider>
-      {/* </ClerkProvider> */}
-      {/* <Component {...pageProps} /> */}
     </Fragment>
   );
 };
+
 export default MyApp;

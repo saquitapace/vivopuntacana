@@ -61,7 +61,7 @@ export const sortEventBlocks = (events, key, isAscending = true) => {
         return compFunc(new Date(a[key]), new Date(b[key]), isAscending)
       } else {
         if (a[key] === b[key]) {
-          return compFunc(new Date(a['startDate' ]), new Date(b['startDate' ]), isAscending)
+          return compFunc(new Date(a['startDate']), new Date(b['startDate']), isAscending)
         } else {
           return compFunc(a[key], b[key], isAscending)
         }
@@ -339,31 +339,52 @@ export const getDateRange = (calendarViewType, targetDate) => {
 }
 
 export const getClosestIndexForDayViewEvents = (date) => {
-	const ZERO = set(date, { minutes: 0 })
-	const FIFTEEN = set(date, { minutes: 15 })
-	const THIRTY = set(date, { minutes: 30 })
-	const FOURTYFIVE = set(date, { minutes: 45 })
+  const hours = getHours(date);
+  const minutes = getMinutes(date);
+  
+  console.log('Getting closest index for:', {
+    date: date.toISOString(),
+    hours,
+    minutes
+  });
 
-	const closest = closestTo(date, [
-		ZERO,
-		FIFTEEN,
-		THIRTY,
-		FOURTYFIVE
-	])
+  // Get closest 15min segment
+  let minuteKey = '0';
+  if (minutes >= 45) {
+    minuteKey = '45';
+  } else if (minutes >= 30) {
+    minuteKey = '30';
+  } else if (minutes >= 15) {
+    minuteKey = '15';
+  }
 
-	return [getHours(date), getMinutes(closest)];
-}
+  return [hours.toString(), minuteKey];
+};
+
+export const getBaseEventBlock = (event) => {
+  console.log('Creating event block for:', event);
+  return {
+    ...event,
+    id: event.eventUid,
+    title: event.eventTitle,
+    startDate: event.eventStartDate,
+    endDate: event.eventEndDate,
+    description: event.eventDescription,
+    location: event.eventLocation,
+    creatorUid: event.eventCreatorUid
+  };
+};
 
 export const findEventCoverage = (event) => {
 	// Get Hour Intervals
 	const coveredHours = eachHourOfInterval({
-	  start: new Date(event.startDate),
-	  end: new Date(event.endDate)
+	  start: new Date(event.eventStartDate),
+	  end: new Date(event.eventEndDate)
 	});	
 
 	// Get Start/End Date Minute Index
-	const startDateMinuteKey = getClosestIndexForDayViewEvents(new Date(event.startDate))[1];
-	const endDateMinuteKey = getClosestIndexForDayViewEvents(new Date(event.endDate))[1];
+	const startDateMinuteKey = getClosestIndexForDayViewEvents(new Date(event.eventStartDate))[1];
+	const endDateMinuteKey = getClosestIndexForDayViewEvents(new Date(event.eventEndDate))[1];
 
 	// Covers only one hour block from start date
 	if (coveredHours.length === 1) {

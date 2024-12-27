@@ -66,7 +66,7 @@ const Header1 = () => {
                     <Link href='/'>
                       <a>
                         <i className='ti-search'></i>
-                        <span>Search here hell</span>
+                        <span>Search here</span>
                       </a>
                     </Link>
                   </li>
@@ -142,7 +142,15 @@ const Header1 = () => {
                           <Blog />
                         </ul>
                       </li>
+                      <SignedIn>
+                        <li className=''>
+                          <Link href='/calendar/day'>
+                            <a className=''>Events</a>
+                          </Link>
+                        </li>
+                      </SignedIn>
                       <Contact />
+
                       <li className='nav-btn'>
                         <Link href='/add-listing'>
                           <a className='main-btn icon-btn'>Add Listing</a>

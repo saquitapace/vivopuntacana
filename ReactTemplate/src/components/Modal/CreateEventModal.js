@@ -1,3 +1,4 @@
+import { useUser } from '@clerk/nextjs';
 import {
   endOfDay,
   format,
@@ -14,133 +15,95 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import {
   MdAccessTime,
-  MdArrowDropDown,
   MdCheckBox,
   MdCheckBoxOutlineBlank,
   MdClose,
   MdColorLens,
   MdDragHandle,
   MdLocationOn,
-  MdSubject,
+  MdSubject
 } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { uuid } from 'uuidv4';
 import {
   setIsCreateEventModalOpen,
+  setSelectedEvent,
   setTargetDate,
 } from '../../reducers/calendar/calendarSettingSlice';
-import { addNewEventToDB } from '../../reducers/dbSlice';
+import { createEvent } from '../../reducers/calendar/calendarSlice';
 import {
   colorLookup,
   isValidTime,
-  repeatTypeStringLookup,
 } from '../../utils/helpers';
-import { EventRepeatTypes, ThemeColorTypes } from '../../utils/types';
+import { ThemeColorTypes } from '../../utils/types';
 import IconButton from '../Common/Button/IconButton';
 import Calendar from '../Common/Calendar/Calendar';
-import Dropdown from '../Common/Dropdown/Dropdown';
+import PreLoader from '../PreLoader';
 
 const CreateEventModal = () => {
   const createEventModalRef = useRef(null);
   const startDateInputRef = useRef(null);
   const endDateInputRef = useRef(null);
-
+  const [isLoading , setIsLoading] = useState(true)
   const [isMouseDown, setIsMouseDown] = useState(false);
 
   const dispatch = useDispatch();
 
-  const currentUser = useSelector((state) => state.user);
-  const { createEventBasis } = useSelector((state) => state.calendarSetting);
+  // const currentUser = useSelector((state) => state.user);
+  const {isSignedIn , user : currentUser , isLoaded} = useUser()
 
+  const { createEventBasis } = useSelector((state) => state.calendarSetting);
+  const {  calendarViewType } = useSelector(
+    (state) => state.calendarSetting
+  );
   const [title, setTitle] = useState('');
   const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
 
-  const [startDate, setStartDate] = useState(Date());
+  const [startDate, setStartDate] = useState(new Date());
   const [startDateInputValue, setStartDateInputValue] = useState('');
   const [showStartDateInput, setShowStartDateInput] = useState(false);
 
-  const [endDate, setEndDate] = useState(Date());
+  const [endDate, setEndDate] = useState(new Date());
   const [endDateInputValue, setEndDateInputValue] = useState('');
   const [showEndDateInput, setShowEndDateInput] = useState(false);
 
   const [isAllDay, setIsAllDay] = useState(false);
-  const [repeatType, setRepeatType] = useState(-1);
   const [themeColor, setThemeColor] = useState(0);
 
-  const [isRepeatTypeDropdownOpen, setIsRepeatTypeDropdownOpen] =
-    useState(false);
   const [isStartDateCalendarOpen, setIsStartDateCalendarOpen] = useState(false);
   const [isEndDateCalendarOpen, setIsEndDateCalendarOpen] = useState(false);
 
-  const repeatTypeDropdownData = [
-    {
-      leftLabel: 'Does not repeat',
-      rightLabel: '',
-      onClickHandler: () => {
-        setRepeatType(-1);
-        setIsRepeatTypeDropdownOpen(false);
-      },
-    },
-    {
-      leftLabel: 'Daily',
-      rightLabel: '',
-      onClickHandler: () => {
-        setRepeatType(EventRepeatTypes.DAILY);
-        setIsRepeatTypeDropdownOpen(false);
-      },
-    },
-    {
-      leftLabel: 'Weekly',
-      rightLabel: '',
-      onClickHandler: () => {
-        setRepeatType(EventRepeatTypes.WEEKLY);
-        setIsRepeatTypeDropdownOpen(false);
-      },
-    },
-    {
-      leftLabel: 'Bi-weekly',
-      rightLabel: '',
-      onClickHandler: () => {
-        setRepeatType(EventRepeatTypes.BI_WEEKLY);
-        setIsRepeatTypeDropdownOpen(false);
-      },
-    },
-    {
-      leftLabel: 'Monthly',
-      rightLabel: '',
-      onClickHandler: () => {
-        setRepeatType(EventRepeatTypes.MONTHLY);
-        setIsRepeatTypeDropdownOpen(false);
-      },
-    },
-    {
-      leftLabel: 'Week-days',
-      rightLabel: '',
-      onClickHandler: () => {
-        setRepeatType(EventRepeatTypes.WEEK_DAYS);
-        setIsRepeatTypeDropdownOpen(false);
-      },
-    },
-  ];
+  const handleCreateEvent = () => {
+    if(!currentUser) return
+    const eventUid = uuid();
+    const event = {
+      eventUid,
+      eventTitle: title.length > 0 ? title : '(No Title)',
+      eventDescription: description,
+      eventCreatorUid: currentUser?.id,
+      eventStartDate: new Date(startDate).toISOString(),
+      eventEndDate: new Date(endDate).toISOString(),
+      eventLocation: location,
+    };
+    // dispatch(setSelectedEvent(event))
+    dispatch(createEvent(currentUser?.id, event , calendarViewType , new Date(startDate).toISOString()));
+    dispatch(setIsCreateEventModalOpen(false));
+  };
 
   const onToggleAllDay = (newVal) => {
     if (newVal) {
       const updatedStartDate = startOfDay(new Date(startDate));
       const updatedEndDate = endOfDay(new Date(endDate));
 
-      setStartDate(updatedStartDate.toString());
-      setEndDate(updatedEndDate.toString());
+      setStartDate(updatedStartDate);
+      setEndDate(updatedEndDate);
     } else {
       const curHour = getHours(new Date());
       const curMin = getMinutes(new Date());
 
-      setStartDate(
-        set(new Date(startDate), { hours: curHour, minutes: curMin }).toString()
-      );
-      setEndDate(
-        set(new Date(endDate), { hours: curHour, minutes: curMin }).toString()
-      );
+      setStartDate(set(new Date(startDate), { hours: curHour, minutes: curMin }));
+      setEndDate(set(new Date(endDate), { hours: curHour, minutes: curMin }));
     }
 
     setIsAllDay(newVal);
@@ -156,28 +119,28 @@ const CreateEventModal = () => {
     if (target === 'start') {
       const updated = set(new Date(startDate), { year, month, date });
 
-      setStartDate(updated.toString());
+      setStartDate(updated);
 
       // Update target date to move calendar date location
-      dispatch(setTargetDate(updated.toString()));
+      dispatch(setTargetDate(updated.toISOString()));
 
       // Check if interval is valid
       if (isBefore(new Date(endDate), updated)) {
-        setEndDate(updated.toString());
+        setEndDate(updated);
       }
 
       setIsStartDateCalendarOpen(false);
     } else if (target === 'end') {
       const updated = set(new Date(endDate), { year, month, date });
 
-      setEndDate(updated.toString());
+      setEndDate(updated);
 
       // Check if interval is valid
       if (isBefore(updated, new Date(startDate))) {
         // Update target date to move calendar date location
-        dispatch(setTargetDate(updated.toString()));
+        dispatch(setTargetDate(updated.toISOString()));
 
-        setStartDate(updated.toString());
+        setStartDate(updated);
       }
 
       setIsEndDateCalendarOpen(false);
@@ -195,10 +158,10 @@ const CreateEventModal = () => {
         // Check if new start date is after end date
         if (isAfter(newStartDate, new Date(endDate))) {
           const newEndDate = set(new Date(endDate), { hours, minutes });
-          setEndDate(newEndDate.toString());
+          setEndDate(newEndDate);
         }
 
-        setStartDate(newStartDate.toString());
+        setStartDate(newStartDate);
       }
 
       setShowStartDateInput(false);
@@ -209,58 +172,25 @@ const CreateEventModal = () => {
         // Check if new end date is before start date
         if (isBefore(newEndDate, new Date(startDate))) {
           const newStartDate = set(new Date(startDate), { hours, minutes });
-          setStartDate(newStartDate.toString());
+          setStartDate(newStartDate);
         }
 
-        setEndDate(newEndDate.toString());
+        setEndDate(newEndDate);
       }
 
       setShowEndDateInput(false);
     }
   };
 
-  const onSaveEvent = () => {
-    let eventGroupUid = null;
-    let eventGroupDetail = null;
-
-    if (repeatType > -1) {
-      eventGroupUid = uuid();
-      eventGroupDetail = {
-        groupUid: eventGroupUid,
-        repeatType,
-        repeatChanges: {},
-      };
+  useEffect(() => {
+    if(isLoaded){
+      setIsLoading(false)
     }
-
-    const newEvent = {
-      title: title.length > 0 ? title : '(No Title)',
-      description,
-      eventCreatorUid: currentUser.userUid,
-      eventGroupUid,
-      startDate,
-      endDate,
-      themeColor,
-      location,
-      invites: [],
-      isAllDay,
-      eventUid: uuid(),
-      createdAt: Date(),
-    };
-
-    dispatch(setIsCreateEventModalOpen(false));
-
-    dispatch(
-      addNewEventToDB({
-        userUid: currentUser.userUid,
-        event: newEvent,
-        eventGroup: eventGroupDetail,
-      })
-    );
-  };
+  } , [  isLoaded])
 
   useEffect(() => {
-    setStartDate(createEventBasis.startDate.toString());
-    setEndDate(createEventBasis.endDate.toString());
+    setStartDate(createEventBasis.startDate);
+    setEndDate(createEventBasis.endDate);
   }, []);
 
   useEffect(() => {
@@ -284,11 +214,7 @@ const CreateEventModal = () => {
     };
   }, [createEventModalRef, isMouseDown]);
 
-  useEffect(() => {
-    if (currentUser) {
-      setThemeColor(currentUser.defaultThemeColor);
-    }
-  }, [currentUser]);
+
 
   useEffect(() => {
     setStartDateInputValue(format(new Date(startDate), 'H:mm'));
@@ -317,7 +243,7 @@ const CreateEventModal = () => {
     showEndDateInput,
   ]);
 
-  return (
+  return isLoading ? <PreLoader/> : (
     <div
       ref={createEventModalRef}
       className='fixed z-40 flex flex-col bg-white rounded-md h-645px min-w-448 bottom-10 left-10 createEventModalBoxShadow'
@@ -488,25 +414,6 @@ const CreateEventModal = () => {
               </div>
               <div>All day</div>
             </div>
-
-            {/* Repeat Selector */}
-            <div className='relative mt-2'>
-              <button
-                className='flex px-2 py-1 -ml-1 transition rounded-md hover:bg-gray-100'
-                onClick={() => setIsRepeatTypeDropdownOpen(true)}
-              >
-                <span className='mr-0.5'>
-                  {repeatTypeStringLookup[repeatType]}
-                </span>
-                <MdArrowDropDown size='18px' color='rgba(75, 85, 99)' />
-              </button>
-              {isRepeatTypeDropdownOpen && (
-                <Dropdown
-                  data={repeatTypeDropdownData}
-                  onCloseDropdown={() => setIsRepeatTypeDropdownOpen(false)}
-                />
-              )}
-            </div>
           </div>
         </div>
 
@@ -593,7 +500,7 @@ const CreateEventModal = () => {
       <div className='flex items-center justify-end px-4 py-3'>
         <button
           className={`px-6 py-2 text-sm text-white bg-opacity-80 transition ${colorLookup[themeColor]} rounded-md`}
-          onClick={() => onSaveEvent()}
+          onClick={() => handleCreateEvent()}
         >
           Save
         </button>
