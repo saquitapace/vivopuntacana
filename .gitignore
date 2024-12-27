@@ -1,0 +1,11 @@
+**/node_modules/
+**/.next/
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+ReactTemplate/.next
+ReactTemplate/.next/cache/webpack/client-development/index.pack
+ReactTemplate/.next/cache/webpack/client-development/0.pack
+/ReactTemplate/.next
+ReactTemplate/.next/server/src_components_Counter_js.js
+ReactTemplate/.next/static/chunks/amp.js
+/ReactTemplate/.next
