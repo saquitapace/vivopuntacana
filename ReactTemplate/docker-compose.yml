@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: vivopuntacana_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: vivopuntacana
+      MYSQL_USER: vivo_user
+      MYSQL_PASSWORD: vivo_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - vivo_network
+
+volumes:
+  mysql_data:
+
+networks:
+  vivo_network:
+    driver: bridge

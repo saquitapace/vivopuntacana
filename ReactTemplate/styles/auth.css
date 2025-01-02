@@ -1,0 +1,78 @@
+.auth-box {
+  margin: 2rem 0;
+}
+
+.auth-box .cl-card {
+  background: #fff !important;
+  border-radius: 10px !important;
+  padding: 2rem !important;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.auth-box .cl-formButtonPrimary {
+  background: #ff344f !important;
+  color: white !important;
+  border: none !important;
+  padding: 12px 30px !important;
+  border-radius: 5px !important;
+  font-weight: 500 !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.auth-box .cl-formButtonPrimary:hover {
+  background: #e01e36 !important;
+}
+
+.auth-box .cl-formFieldInput {
+  width: 100% !important;
+  padding: 0.75rem 1rem !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 5px !important;
+  font-size: 1rem !important;
+  transition: border-color 0.2s ease !important;
+}
+
+.auth-box .cl-formFieldInput:focus {
+  border-color: #ff344f !important;
+  outline: none !important;
+}
+
+.auth-box .cl-footerActionLink {
+  color: #ff344f !important;
+  text-decoration: none !important;
+  transition: color 0.2s ease !important;
+}
+
+.auth-box .cl-footerActionLink:hover {
+  color: #e01e36 !important;
+}
+
+.auth-box .cl-dividerText {
+  color: #4b5563 !important;
+}
+
+.auth-box .cl-socialButtonsIconButton {
+  border: 1px solid #e0e0e0 !important;
+  transition: border-color 0.2s ease !important;
+}
+
+.auth-box .cl-socialButtonsIconButton:hover {
+  border-color: #ff344f !important;
+}
+
+.auth-box .cl-alert {
+  border-radius: 5px !important;
+  margin-bottom: 1rem !important;
+}
+
+.auth-box .cl-headerTitle {
+  color: #1b1b1b !important;
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.clerk-sign-in, .clerk-sign-up {
+  width: 100%;
+}

@@ -19,11 +19,14 @@ import {
   getInitialUsers,
 } from '@/src/utils/data';
 // import '../../styles/tailwind-styles.css';
+import { useTranslation } from 'react-i18next';
+
 export default function Home() {
   const router = useRouter();
   const dispatch = useDispatch();
   const isDBLoaded = useSelector((state) => state.db.isDBLoaded);
   const { userDB } = useSelector((state) => state.db.db);
+  const { t } = useTranslation();
 
   useEffect(() => {
     dispatch(resetCalendarEvents());
@@ -70,7 +73,7 @@ export default function Home() {
             />
             <p className='ml-4 text-2xl text-gray-600'>Kalendar</p>
           </div>
-          <p className='font-bold text-gray-600'>Welcome to Kalendar</p>
+          <p className='font-bold text-gray-600'>{t('welcome')} to Kalendar</p>
           <p className='pb-4 text-gray-400 border-b'>
             A Simplified Google Calendar Clone Project Using Next.js
           </p>

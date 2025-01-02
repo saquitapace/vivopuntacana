@@ -51,9 +51,9 @@ const MobileMenu = () => {
             <div className='col-md-5'>
               <div className='top-content text-center'>
                 <p>
-                  We Have Special Offers Every{' '}
+                  Claim your business{' '}
                   <Link href='/'>
-                    <a>Find your offer</a>
+                    <a>here</a>
                   </Link>
                 </p>
               </div>

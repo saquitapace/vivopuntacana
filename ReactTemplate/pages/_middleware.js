@@ -4,24 +4,21 @@ import { NextResponse } from 'next/server';
 function isRouteProtected(pathname) {
   const protectedPatterns = [
     /^\/calendar(\/.*)?$/, // Protect `/calendar` and subroutes like `/calendar/*`
+    /^\/complete-profile$/,
   ];
 
   if (pathname.includes('calendar')) {
-    console.log(
-      'route is protected:',
-      pathname,
-      protectedPatterns.some((pattern) => pattern.test(pathname))
-    );
+    return protectedPatterns.some((pattern) => pattern.test(pathname));
   }
   return protectedPatterns.some((pattern) => pattern.test(pathname));
 }
 
-export default withClerkMiddleware((req) => {
+export default withClerkMiddleware(async (req, ...res) => {
   const { pathname } = req.nextUrl;
   if (!isRouteProtected(pathname)) {
     return NextResponse.next();
   }
-  console.log('route is protected:', pathname);
+  // const { userId } = await req.auth();
   const authStatus = req?.__clerkAuthStatus;
 
   if (authStatus !== 'signed-in') {
@@ -31,7 +28,6 @@ export default withClerkMiddleware((req) => {
   }
   return NextResponse.next();
 });
-
 export const config = {
-  matcher: ['/calendar/:path*'],
+  matcher: '/((?!_next).*)', // Protect all routes except Next.js-specific ones
 };
