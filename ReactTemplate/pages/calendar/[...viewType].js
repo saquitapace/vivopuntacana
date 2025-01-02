@@ -62,8 +62,6 @@ const CalendarView = () => {
   };
 
   const onClickOutsideEventDetailModal = (eventUid) => {
-    console.log(selectedEvent.eventUid);
-    console.log(eventUid);
   };
 
   useEffect(() => {

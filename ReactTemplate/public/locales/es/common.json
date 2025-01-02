@@ -1,0 +1,58 @@
+{
+  "welcome": "Bienvenido",
+  "home": "Inicio",
+  "about": "Acerca de",
+  "contact": "Contacto",
+  "search": "Buscar",
+  "login": "Iniciar Sesión",
+  "register": "Registrarse",
+  "language": "Idioma",
+  "hero": {
+    "title": "Sueña Explora Descubre",
+    "subtitle": "La Gente No Toma Viajes, Los Viajes Toman a la Gente",
+    "searchByCategory": "Buscar por Categoría",
+    "location": "Ubicación",
+    "searchNow": "Buscar Ahora"
+  },
+  "popular": {
+    "title": "Popular",
+    "places": {
+      "saloon": "Salón",
+      "restaurant": "Restaurante",
+      "game": "Juego",
+      "counter": "Contador",
+      "trainStation": "Estación de Tren",
+      "parking": "Estacionamiento",
+      "shopping": "Compras"
+    }
+  },
+  "auth": {
+    "signIn": "Iniciar Sesión",
+    "signUp": "Registrarse",
+    "signOut": "Cerrar Sesión",
+    "forgotPassword": "¿Olvidaste tu Contraseña?",
+    "welcomeBack": "¡Bienvenido de Nuevo!",
+    "joinUs": "Únete a Nosotros",
+    "createAccount": "Crear una Cuenta",
+    "signInDescription": "Inicia sesión para acceder a tu cuenta y explorar nuestras increíbles funciones.",
+    "signUpDescription": "Crea una cuenta y comienza tu viaje con nosotros hoy.",
+    "signInPrompt": "Ingresa tus credenciales para acceder a tu cuenta",
+    "signUpPrompt": "Completa tu información para crear una cuenta",
+    "role": "Selecciona tu Rol",
+    "roles": {
+      "user": "Usuario",
+      "merchant": "Comerciante",
+      "artist": "Artista",
+      "admin": "Administrador"
+    },
+    "continue": "Continuar",
+    "submitting": "Enviando...",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "phoneNumber": "Número de Teléfono",
+    "completeProfile": "Completa tu Perfil",
+    "completeProfileDescription": "Necesitamos algunos detalles más para completar tu perfil.",
+    "completeProfilePrompt": "Por favor, proporciona la siguiente información para continuar.",
+    "complete": "Completar Perfil"
+  }
+}

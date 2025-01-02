@@ -1,13 +1,10 @@
+import MessageIcon from '@/src/components/MessageIcon';
+import NotificationIcon from '@/src/components/NotificationIcon';
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { LogIn } from 'lucide-react';
 import Link from 'next/link';
-import React from 'react';
-import { About, Blog, Contact, Home, Listing, Pages } from '../Menu';
-import {
-  RedirectToSignIn,
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  UserButton,
-} from '@clerk/nextjs';
+import { Contact, Home, Listing, Pages } from '../Menu';
+import LanguageSwitcher from '@/src/components/LanguageSwitcher';
 
 const Header1 = () => {
   return (
@@ -52,41 +49,22 @@ const Header1 = () => {
             <div className='col-md-4'>
               <div className='top-content text-center'>
                 <p>
-                  We Have Special Offers Every{' '}
+                  Claim your business{' '}
                   <Link href='/'>
-                    <a>Find your offer</a>
+                    <a>Here</a>
                   </Link>
                 </p>
               </div>
             </div>
             <div className='col-md-4'>
-              <div className='top-right'>
-                <ul className='d-flex'>
-                  <li>
-                    <Link href='/'>
-                      <a>
-                        <i className='ti-search'></i>
-                        <span>Search here</span>
-                      </a>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href='/'>
-                      <a>
-                        <i className='ti-heart'></i>
-                        <span>Wishlist</span>
-                      </a>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href='/'>
-                      <a>
-                        <i className='ti-shopping-cart'></i>
-                        <span>Cart</span>
-                      </a>
-                    </Link>
-                  </li>
-                </ul>
+              <div className='flex justify-end '>
+                {/* <ul className='d-flex'> */}
+                {/* <li> */}
+                {/* <div className='w-1/3 border z-100'> */}
+                <LanguageSwitcher />
+                {/* </div> */}
+                {/* </li> */}
+                {/* </ul> */}
               </div>
             </div>
           </div>
@@ -123,7 +101,6 @@ const Header1 = () => {
                           <Home />
                         </ul>
                       </li>
-                      <About />
                       <li className='menu-item has-children'>
                         <a href='#'>Listings</a>
                         <ul className='sub-menu'>
@@ -136,12 +113,7 @@ const Header1 = () => {
                           <Pages />
                         </ul>
                       </li>
-                      <li className='menu-item has-children'>
-                        <a href='#'>Article</a>
-                        <ul className='sub-menu'>
-                          <Blog />
-                        </ul>
-                      </li>
+
                       <SignedIn>
                         <li className=''>
                           <Link href='/calendar/day'>
@@ -163,6 +135,12 @@ const Header1 = () => {
               <div className='col-lg-4 col-5'>
                 <div className='header-right-nav'>
                   <ul className='d-flex align-items-center'>
+                    <li className='cursor-pointer'>
+                      <MessageIcon />
+                    </li>
+                    <li className='cursor-pointer'>
+                      <NotificationIcon />
+                    </li>
                     <li className='user-btn'>
                       <SignedIn>
                         {/* Mount the UserButton component */}
@@ -170,7 +148,11 @@ const Header1 = () => {
                       </SignedIn>
                       <SignedOut>
                         {/* Signed out users get sign in button */}
-                        <Link href='/sign-in'>Sign In</Link>
+                        <div className='px-3 py-2 text-lg  shadow rounded-xl bg cursor-pointer'>
+                          <Link href='/sign-in'>
+                            <LogIn />
+                          </Link>
+                        </div>
                         {/* <SignInButton /> */}
                       </SignedOut>
                       {/* <Link href='/'>

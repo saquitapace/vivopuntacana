@@ -342,13 +342,6 @@ export const getClosestIndexForDayViewEvents = (date) => {
   const hours = getHours(date);
   const minutes = getMinutes(date);
   
-  console.log('Getting closest index for:', {
-    date: date.toISOString(),
-    hours,
-    minutes
-  });
-
-  // Get closest 15min segment
   let minuteKey = '0';
   if (minutes >= 45) {
     minuteKey = '45';
@@ -362,7 +355,6 @@ export const getClosestIndexForDayViewEvents = (date) => {
 };
 
 export const getBaseEventBlock = (event) => {
-  console.log('Creating event block for:', event);
   return {
     ...event,
     id: event.eventUid,

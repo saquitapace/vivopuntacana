@@ -1,0 +1,58 @@
+{
+  "welcome": "Welcome",
+  "home": "Home",
+  "about": "About",
+  "contact": "Contact",
+  "search": "Search",
+  "login": "Login",
+  "register": "Register",
+  "language": "Language",
+  "hero": {
+    "title": "Dream Explore Discover",
+    "subtitle": "People Don't Take, Trips Take People",
+    "searchByCategory": "Search By Category",
+    "location": "Location",
+    "searchNow": "Search Now"
+  },
+  "popular": {
+    "title": "Popular",
+    "places": {
+      "saloon": "Saloon",
+      "restaurant": "Restaurant",
+      "game": "Game",
+      "counter": "Counter",
+      "trainStation": "Train Station",
+      "parking": "Parking",
+      "shopping": "Shopping"
+    }
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "forgotPassword": "Forgot Password?",
+    "welcomeBack": "Welcome Back!",
+    "joinUs": "Join Us Today",
+    "createAccount": "Create an Account",
+    "signInDescription": "Sign in to access your account and explore our amazing features.",
+    "signUpDescription": "Create an account and start your journey with us today.",
+    "signInPrompt": "Enter your credentials to access your account",
+    "signUpPrompt": "Fill in your information to create an account",
+    "role": "Select Your Role",
+    "roles": {
+      "user": "User",
+      "merchant": "Merchant",
+      "artist": "Artist",
+      "admin": "Admin"
+    },
+    "continue": "Continue",
+    "submitting": "Submitting...",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "phoneNumber": "Phone Number",
+    "completeProfile": "Complete Your Profile",
+    "completeProfileDescription": "We need a few more details to complete your profile.",
+    "completeProfilePrompt": "Please provide the following information to continue.",
+    "complete": "Complete Profile"
+  }
+}

@@ -1,25 +1,30 @@
 import NextNProgress from 'nextjs-progressbar';
+import { appWithTranslation } from 'next-i18next';
 
 import ClientClerkProvider from '@/src/providers/ClerkClientProvider';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import { NotificationsProvider } from 'reapop';
+
 import { Fragment, useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
+import LanguageSwitcher from '../src/components/LanguageSwitcher';
 import PreLoader from '../src/components/PreLoader';
 import config from '../src/config/store';
 import '../styles/globals.css';
 import '../styles/tailwind-styles.css';
+import Notification from '@/src/components/Notifications';
 
-const store = config();
+const { store } = config();
 
 const MyApp = ({ Component, pageProps }) => {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Set initial state to true
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    setLoading(false);
+    setLoading(false); // Hide loading after initial mount
 
     const handleRouteChangeStart = () => setLoading(true);
     const handleRouteChangeComplete = () => setLoading(false);
@@ -59,12 +64,14 @@ const MyApp = ({ Component, pageProps }) => {
       {loading && <PreLoader />}
 
       <ClientClerkProvider>
-        <Provider store={store}>
-          <Component {...pageProps} />
-        </Provider>
+        <NotificationsProvider>
+          <Notification />
+          <Provider store={store}>
+            <Component {...pageProps} />
+          </Provider>
+        </NotificationsProvider>
       </ClientClerkProvider>
     </Fragment>
   );
 };
-
-export default MyApp;
+export default appWithTranslation(MyApp);
