@@ -1,11 +1,14 @@
 'use client';
-import { ClerkLoaded, ClerkLoading, SignIn } from '@clerk/nextjs';
-import './sign-in.css';
+import { ClerkLoaded, ClerkLoading, SignUp } from '@clerk/nextjs';
+import './sign-up.css';
 import Layout from '@/src/layouts/Layout';
 import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 
-export default function SignInPage() {
-  const t = useTranslations('common');
+export default function SignUpPage() {
+  const t = useTranslations('Auth');
+  const tCommon = useTranslations('Common');
+  const locale = useLocale();
 
   return (
     <Layout>
@@ -14,21 +17,22 @@ export default function SignInPage() {
           <div className='row justify-content-center'>
             <div className='col-lg-6'>
               <div className='login-form-box'>
-                <h3 className='form-title'>{t('auth.welcome_back')}</h3>
+                <h3 className='form-title'>{t('signup_title')}</h3>
+                <p className='text-center mb-4'>{t('signup_subtitle')}</p>
                 <ClerkLoading>
                   <div className='clerk-loading-skeleton'>
-                    <div className='skeleton social-buttons'></div>
-                    <div className='skeleton or-divider'></div>
-                    <div className='skeleton input'></div>
-                    <div className='skeleton input'></div>
-                    <div className='skeleton button'></div>
-                    <div className='skeleton footer-link'></div>
+                    <div className='skeleton social-buttons' aria-label={t('socialButtons')}></div>
+                    <div className='skeleton or-divider' aria-label={t('orDivider')}></div>
+                    <div className='skeleton input' aria-label={t('email')}></div>
+                    <div className='skeleton input' aria-label={t('password')}></div>
+                    <div className='skeleton button' aria-label={t('continueButton')}></div>
+                    <div className='skeleton footer-link' aria-label={t('footerText')}></div>
                   </div>
                 </ClerkLoading>
                 <ClerkLoaded>
-                  <SignIn
-                    fallbackRedirectUrl='/complete-profile'
-                    forceRedirectUrl='/complete-profile'
+                  <SignUp
+                    fallbackRedirectUrl={`/${locale}/complete-profile`}
+                    forceRedirectUrl={`/${locale}/complete-profile`}
                     appearance={{
                       elements: {
                         rootBox: 'clerk-form',
@@ -45,21 +49,23 @@ export default function SignInPage() {
                       },
                       text: {
                         socialButtonsBlockButton: {
-                          google: t('auth.or_continue_with') + ' Google',
+                          google: t('orContinueWith') + ' Google',
                         },
                         formFieldLabel: {
-                          emailAddress: t('auth.email'),
-                          password: t('auth.password'),
+                          emailAddress: t('email'),
+                          password: t('password'),
+                          firstName: t('full_name').split(' ')[0],
+                          lastName: t('full_name').split(' ')[1],
                         },
                         footerActionLink: {
-                          signIn: t('auth.sign_in'),
-                          signUp: t('auth.sign_up'),
+                          signIn: t('sign_in'),
+                          signUp: t('sign_up'),
                         },
                         dividerText: t('auth.or_continue_with'),
                       },
                     }}
                     routing='path'
-                    path='/sign-in'
+                    path={`/${locale}/sign-up`}
                   />
                 </ClerkLoaded>
               </div>

@@ -12,7 +12,7 @@ import {
 
 export async function GET(req) {
   try {
-    const { userId } = await auth();
+    const { userId } = auth();
     if (!userId) {
       return new Response('Unauthorized', { status: 401 });
     }

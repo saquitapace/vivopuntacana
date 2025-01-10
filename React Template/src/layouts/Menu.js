@@ -1,78 +1,91 @@
 import Link from "next/link";
 import React, { Fragment } from "react";
+import { useLocale } from 'next-intl';
 
-export const Home = () => (
+const withLocale = (Component) => {
+  return function WrappedComponent(props) {
+    const locale = useLocale();
+    return <Component locale={locale} {...props} />;
+  };
+};
+
+export const Home = withLocale(({ locale }) => (
   <Fragment>
     <li className="menu-item">
-      <Link href="/">Home One</Link>
+      <Link href={`/${locale}`}>Home One</Link>
     </li>
     <li className="menu-item">
-      <Link href="/index-2">Home Two</Link>
+      <Link href={`/${locale}/index-2`}>Home Two</Link>
     </li>
     <li className="menu-item">
-      <Link href="/index-3">Home Three</Link>
+      <Link href={`/${locale}/index-3`}>Home Three</Link>
     </li>
   </Fragment>
-);
-export const About = () => (
+));
+
+export const About = withLocale(({ locale }) => (
   <Fragment>
     <li className="menu-item">
-      <Link href="/about">About us</Link>
+      <Link href={`/${locale}/about`}>About us</Link>
     </li>
   </Fragment>
-);
-export const Listing = () => (
+));
+
+export const Listing = withLocale(({ locale }) => (
   <Fragment>
     <li className="menu-item">
-      <Link href="/listing-list">Listing List</Link>
+      <Link href={`/${locale}/listing-list`}>Listing List</Link>
     </li>
     <li className="menu-item">
-      <Link href="/listing-grid">Listing Grid</Link>
+      <Link href={`/${locale}/listing-grid`}>Listing Grid</Link>
     </li>
     <li className="menu-item">
-      <Link href="/listing-map">Listing Map Grid</Link>
+      <Link href={`/${locale}/listing-map`}>Listing Map Grid</Link>
     </li>
     <li className="menu-item">
-      <Link href="/listing-details-1">Listing Details One</Link>
+      <Link href={`/${locale}/listing-details-1`}>Listing Details One</Link>
     </li>
     <li className="menu-item">
-      <Link href="/listing-details-2">Listing Details Two</Link>
+      <Link href={`/${locale}/listing-details-2`}>Listing Details Two</Link>
     </li>
   </Fragment>
-);
-export const Pages = () => (
+));
+
+export const Pages = withLocale(({ locale }) => (
   <Fragment>
     <li className="menu-item">
-      <Link href="/add-listing">Add Listing</Link>
+      <Link href={`/${locale}/add-listing`}>Add Listing</Link>
     </li>
     <li>
-      <Link href="/products">Our Products</Link>
+      <Link href={`/${locale}/products`}>Our Products</Link>
     </li>
     <li>
-      <Link href="/product-details">Products Details</Link>
+      <Link href={`/${locale}/product-details`}>Products Details</Link>
     </li>
     <li className="menu-item">
-      <Link href="/how-work">How Work</Link>
+      <Link href={`/${locale}/how-work`}>How Work</Link>
     </li>
     <li className="menu-item">
-      <Link href="/pricing">Pricing</Link>
+      <Link href={`/${locale}/pricing`}>Pricing</Link>
     </li>
   </Fragment>
-);
-export const Blog = () => (
+));
+
+export const Blog = withLocale(({ locale }) => (
   <Fragment>
     <li className="menu-item">
-      <Link href="/blog">Our Blog</Link>
+      <Link href={`/${locale}/blog`}>Our Blog</Link>
     </li>
     <li className="menu-item">
-      <Link href="/blog-details">Blog details</Link>
+      <Link href={`/${locale}/blog-details`}>Blog details</Link>
     </li>
   </Fragment>
-);
-export const Contact = () => (
+));
+
+export const Contact = withLocale(({ locale }) => (
   <Fragment>
     <li className="menu-item">
-      <Link href="/contact">Contact</Link>
+      <Link href={`/${locale}/contact`}>Contact</Link>
     </li>
   </Fragment>
-);
+));

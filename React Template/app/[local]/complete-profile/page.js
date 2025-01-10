@@ -1,4 +1,5 @@
 'use client';
+import { createOrUpdateUser } from '@/app/actions/user.action';
 import ArtistInfoStep from '@/src/components/Onboarding/ArtistInfoStep';
 import CommonInfoStep from '@/src/components/Onboarding/CommonInfoStep';
 import FinalStep from '@/src/components/Onboarding/FInalStep';
@@ -10,10 +11,10 @@ import UserTypeSelection from '@/src/components/UserTypeSelection';
 import Layout from '@/src/layouts/Layout';
 import { useUser } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslations } from 'next-intl';
 import { useCallback, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { createOrUpdateUser } from '../actions/user.action';
 
 const userSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
@@ -28,6 +29,7 @@ const userSchema = z.object({
 
 export default function OnboardingPage() {
   const { user } = useUser();
+  const t = useTranslations('Onboarding');
   const userId = user?.id;
   const [step, setStep] = useState(0);
   const [userType, setUserType] = useState(null);
@@ -45,60 +47,6 @@ export default function OnboardingPage() {
       businessEmail: '',
     },
   });
-
-  const steps = [
-    {
-      id: 'user-type',
-      title: 'Select User Type',
-      component: (
-        <UserTypeSelection
-          userType={userType}
-          setUserType={setUserType}
-          onNext={() => setStep(1)}
-        />
-      ),
-    },
-    {
-      id: 'user-info',
-      title: 'Personal Info',
-      component: (
-        <UserInfoStep onNext={() => setStep(2)} onBack={() => setStep(0)} />
-      ),
-    },
-    {
-      id: 'common-info',
-      title: t('profile.contact_info'),
-      component: (
-        <CommonInfoStep onNext={() => setStep(3)} onBack={() => setStep(1)} />
-      ),
-    },
-    {
-      id: 'specific-info',
-      title:
-        userType === 'artist'
-          ? t('profile.artist_info')
-          : t('profile.business_info'),
-      component:
-        userType === 'artist' ? (
-          <ArtistInfoStep onNext={() => setStep(4)} onBack={() => setStep(2)} />
-        ) : (
-          <MerchantInfoStep
-            onNext={() => setStep(4)}
-            onBack={() => setStep(2)}
-          />
-        ),
-    },
-    {
-      id: 'final',
-      title: t('profile.complete'),
-      component: <FinalStep onBack={() => setStep(3)} />,
-    },
-  ];
-
-  const handleBack = useCallback(() => {
-    if (step > 0) setStep((step) => step - 1);
-  }, [step]);
-
   const handleUserTypeSelect = useCallback(
     (type) => {
       setUserType(type);
@@ -106,6 +54,28 @@ export default function OnboardingPage() {
     },
     [step]
   );
+
+  const steps = [
+    { title: 'User Type', component: null },
+    { title: 'Personal Info', component: CommonInfoStep },
+    {
+      title: 'Additional Info',
+      component:
+        userType === 'user'
+          ? UserInfoStep
+          : userType === 'artist'
+          ? ArtistInfoStep
+          : userType === 'merchant'
+          ? MerchantInfoStep
+          : null,
+    },
+    { title: 'Finish', component: FinalStep },
+  ];
+
+  const CurrentStepComponent = steps[step]?.component;
+  const handleBack = useCallback(() => {
+    if (step > 0) setStep((step) => step - 1);
+  }, [step]);
 
   const handleSubmit = async (data) => {
     try {
@@ -187,27 +157,26 @@ export default function OnboardingPage() {
                   <p className='text-gray-600'>{t('profile.get_started')}</p>
                 </div>
 
-                <ProgressBar step={step} steps={steps} />
-
-                <FormProvider {...methods}>
-                  <form
-                    onSubmit={methods.handleSubmit(handleSubmit)}
-                    className='mt-8'
-                  >
-                    <div className='space-y-6'>{steps[step].component}</div>
-
-                    {step > 0 && (
-                      <div className='mt-8 pt-6 border-t border-gray-200'>
-                        <StepNavigator
-                          step={step}
-                          steps={steps}
-                          onNext={handleNext}
-                          onBack={handleBack}
-                        />
-                      </div>
-                    )}
-                  </form>
-                </FormProvider>
+                <div className='p-8'>
+                  <ProgressBar step={step} steps={steps} />
+                  <FormProvider {...methods}>
+                    <form onSubmit={methods.handleSubmit(handleSubmit)}>
+                      {step === 0 ? (
+                        <UserTypeSelection onSelect={handleUserTypeSelect} />
+                      ) : (
+                        CurrentStepComponent && (
+                          <CurrentStepComponent userType={userType} />
+                        )
+                      )}
+                      <StepNavigator
+                        step={step}
+                        steps={steps}
+                        onNext={handleNext}
+                        onBack={handleBack}
+                      />
+                    </form>
+                  </FormProvider>
+                </div>
               </div>
             </div>
           </div>

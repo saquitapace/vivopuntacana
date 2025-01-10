@@ -1,5 +1,6 @@
 'use client';
 import { useAuth, UserButton, ClerkLoading, ClerkLoaded } from '@clerk/nextjs';
+import { useLocale } from 'next-intl';
 import Link from 'next/link';
 import React from 'react';
 import { IoNotificationsOutline, IoChatbubbleOutline } from 'react-icons/io5';
@@ -32,6 +33,7 @@ const MessageIcon = ({ messages = 4 }) => {
 };
 
 const UserPrfoile = () => {
+  const locale = useLocale();
   const { isLoaded, isSignedIn, userId } = useAuth();
   console.log('isLoaded ', isLoaded, isSignedIn, userId);
   return (
@@ -59,7 +61,7 @@ const UserPrfoile = () => {
           </>
         ) : (
           <>
-            <Link className='icon' href='/sign-in'>
+            <Link className='icon' href={`/${locale}/sign-in`}>
               <i className='flaticon-avatar'></i>
             </Link>
           </>

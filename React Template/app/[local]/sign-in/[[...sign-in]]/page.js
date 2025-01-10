@@ -1,11 +1,13 @@
-'use client';
-import { ClerkLoaded, ClerkLoading, SignUp } from '@clerk/nextjs';
-import './sign-up.css';
+import { ClerkLoaded, ClerkLoading, SignIn } from '@clerk/nextjs';
+import './sign-in.css';
 import Layout from '@/src/layouts/Layout';
-import { useTranslation } from 'react-i18next';
+import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 
-export default function SignUpPage() {
-  const { t } = useTranslation();
+export default function SignInPage() {
+  const t = useTranslations('Auth');
+  const tCommon = useTranslations('Common');
+  const locale = useLocale();
 
   return (
     <Layout>
@@ -14,7 +16,8 @@ export default function SignUpPage() {
           <div className='row justify-content-center'>
             <div className='col-lg-6'>
               <div className='login-form-box'>
-                <h3 className='form-title'>{t('auth.create_account')}</h3>
+                <h3 className='form-title'>{t('welcomeBack')}</h3>
+                <p className='text-center mb-4'>{t('enterDetails')}</p>
                 <ClerkLoading>
                   <div className='clerk-loading-skeleton'>
                     <div className='skeleton social-buttons'></div>
@@ -26,7 +29,7 @@ export default function SignUpPage() {
                   </div>
                 </ClerkLoading>
                 <ClerkLoaded>
-                  <SignUp
+                  <SignIn
                     fallbackRedirectUrl='/complete-profile'
                     forceRedirectUrl='/complete-profile'
                     appearance={{
@@ -45,23 +48,22 @@ export default function SignUpPage() {
                       },
                       text: {
                         socialButtonsBlockButton: {
-                          google: t('auth.or_continue_with') + ' Google',
+                          google: t('orContinueWith') + ' Google',
                         },
                         formFieldLabel: {
-                          emailAddress: t('auth.email'),
-                          password: t('auth.password'),
-                          firstName: t('auth.full_name').split(' ')[0],
-                          lastName: t('auth.full_name').split(' ')[1],
+                          emailAddress: t('email'),
+                          password: t('password'),
                         },
                         footerActionLink: {
-                          signIn: t('auth.sign_in'),
-                          signUp: t('auth.sign_up'),
+                          signIn: t('sign_in'),
+                          signUp: t('sign_up'),
                         },
-                        dividerText: t('auth.or_continue_with'),
+                        dividerText: t('orContinueWith'),
                       },
                     }}
+                    signUpUrl={`/${locale}/sign-up`}
                     routing='path'
-                    path='/sign-up'
+                    // path='/sign-in'
                   />
                 </ClerkLoaded>
               </div>

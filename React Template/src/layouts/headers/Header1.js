@@ -1,9 +1,11 @@
 import UserPrfoile from '@/src/components/UserPrfoile';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { Contact, Home, Listing, Pages } from '../Menu';
 import LanguageSelector from '@/src/components/LanguageSelector';
 
 const Header1 = () => {
+  const t = useTranslations('Navigation');
   return (
     <header className='header-area header-area-one d-none d-xl-block'>
       <div className='header-top'>
@@ -13,7 +15,7 @@ const Header1 = () => {
               <div className='top-social'>
                 <ul className='social-link'>
                   <li>
-                    <span>Follow us:</span>
+                    <span>{t('follow_us')}:</span>
                   </li>
                   <li>
                     <a href='#'>
@@ -46,7 +48,7 @@ const Header1 = () => {
             <div className='col-md-4'>
               <div className='top-content text-center'>
                 <p>
-                  Claim your business <Link href='/'>here</Link>
+                  {t('claim_business')} <Link href='/'>{t('here')}</Link>
                 </p>
               </div>
             </div>
@@ -62,7 +64,7 @@ const Header1 = () => {
                   <li>
                     <Link href='/'>
                       <i className='ti-search'></i>
-                      <span>Search here</span>
+                      <span>{t('search_here')}</span>
                     </Link>
                   </li>
                 </ul>
@@ -78,7 +80,7 @@ const Header1 = () => {
               <div className='col-lg-2 col-5'>
                 <div className='site-branding'>
                   <Link className='brand-logo' href='/'>
-                    <img src='assets/images/logo/logo-1.png' alt='Brand Logo' />
+                    <img src='/assets/images/logo/logo-1.png' alt='Brand Logo' />
                   </Link>
                 </div>
               </div>
@@ -90,31 +92,31 @@ const Header1 = () => {
                   <nav className='main-menu'>
                     <ul>
                       <li className='menu-item has-children'>
-                        <Link href='/'>Home</Link>
+                        <Link href='/'>{t('menu_home')}</Link>
                         <ul className='sub-menu'>
                           <Home />
                         </ul>
                       </li>
                       <li className='menu-item has-children'>
-                        <a href='#'>Listings</a>
+                        <a href='#'>{t('menu_listings')}</a>
                         <ul className='sub-menu'>
                           <Listing />
                         </ul>
                       </li>
                       <li className='menu-item has-children'>
-                        <a href='#'>Pages</a>
+                        <a href='#'>{t('menu_pages')}</a>
                         <ul className='sub-menu'>
                           <Pages />
                         </ul>
                       </li>
                       <li className='menu-item '>
-                        <Link href='/calendar/day'>Calendar</Link>
+                        <Link href='/calendar/day'>{t('menu_calendar')}</Link>
                       </li>
 
                       <Contact />
                       <li className='nav-btn'>
                         <Link className='main-btn icon-btn' href='/add-listing'>
-                          Add Listing
+                          {t('add_listing_btn')}
                         </Link>
                       </li>
                     </ul>
@@ -127,7 +129,7 @@ const Header1 = () => {
                     <UserPrfoile />
                     <li className='hero-nav-btn'>
                       <Link className='main-btn icon-btn' href='/add-listing'>
-                        Add Listing
+                        {t('add_listing_btn')}
                       </Link>
                     </li>
                     <li className='nav-toggle-btn'>

@@ -93,12 +93,14 @@ const MobileMenu = () => {
               <div className='col-lg-2 col-5'>
                 <div className='site-branding'>
                   <Link className='brand-logo' href='/'>
-                    <img src='assets/images/logo/logo-1.png' alt='Brand Logo' />
+                    <img src='/assets/images/logo/logo-1.png' alt='Brand Logo' />
                   </Link>
                 </div>
               </div>
               <div className='col-lg-6 col-2'>
-                <div className={`nav-menu ${toggle ? 'menu-on' : ''}`}>
+                <div
+                  className={`nav-menu ${toggle ? 'menu-on' : ''}`}
+                >
                   <div
                     className='navbar-close'
                     onClick={() => setToggle(false)}
