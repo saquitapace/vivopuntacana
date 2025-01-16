@@ -81,25 +81,30 @@ const CalendarViewGrid = () => {
       return splitA[0] - splitB[0];
     });
 
-    return monthKeys.map((monthDateKey, index) => {
-      const [month, date] = monthDateKey.split('-');
-
-      return (
-        <CalendarViewGridItem
-          key={monthDateKey}
-          targetDate={targetDate}
-          index={index}
-          month={Number(convertMonthKey(month, targetDate))}
-          date={Number(date)}
-          events={getUpdatedEventBlocksWithPlacement(
-            updatedContainer[monthDateKey]['events'],
-            updatedContainer[monthDateKey]['incomingRowsMatrix']
-          )}
-          hoveredEventUid={hoveredEventUid}
-          setHoveredEventUid={setHoveredEventUid}
-        />
-      );
-    });
+    return monthKeys
+      .filter((f) => {
+        const [month, date] = f.split('-');
+        return Boolean(Number(month) && Number(date));
+      })
+      .map((monthDateKey, index) => {
+        const [month, date] = monthDateKey.split('-');
+        console.log('month date ', month, date);
+        return (
+          <CalendarViewGridItem
+            key={monthDateKey}
+            targetDate={targetDate}
+            index={index}
+            month={Number(convertMonthKey(month, targetDate))}
+            date={Number(date)}
+            events={getUpdatedEventBlocksWithPlacement(
+              updatedContainer[monthDateKey]['events'],
+              updatedContainer[monthDateKey]['incomingRowsMatrix']
+            )}
+            hoveredEventUid={hoveredEventUid}
+            setHoveredEventUid={setHoveredEventUid}
+          />
+        );
+      });
   };
 
   const onWheel = (e) => {

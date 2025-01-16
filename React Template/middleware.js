@@ -71,15 +71,19 @@ export default clerkMiddleware((auth, req) => {
   if (!userId) {
     return NextResponse.redirect(new URL(`/${locale}/sign-in`, req.url));
   }
-
+  console.log('sessionClaims', sessionClaims);
   // Check profile completion for protected routes
   const isProfileCompleted = sessionClaims?.metadata?.profileCompleted;
+  console.log('isProfileCompleted', isProfileCompleted, pathWithoutLocale);
   if (!isProfileCompleted && pathWithoutLocale !== '/complete-profile') {
     return NextResponse.redirect(
       new URL(`/${locale}/complete-profile`, req.url)
     );
   }
-
+  if (isProfileCompleted && pathWithoutLocale === '/complete-profile') {
+    return NextResponse.redirect(new URL(`/${locale}/`, req.url));
+  }
+  console.log('returning response');
   return response;
 });
 

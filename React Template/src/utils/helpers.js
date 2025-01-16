@@ -79,7 +79,7 @@ export const sortEventBlocks = (events, key, isAscending = true) => {
     }
   };
 
-  return events.slice().sort((a, b) => {
+  return events?.slice()?.sort((a, b) => {
     if (key === 'startDate' || key === 'endDate' || key === 'createdAt') {
       return compFunc(new Date(a[key]), new Date(b[key]), isAscending);
     } else {
@@ -179,14 +179,14 @@ export const getBaseMonthViewEvents = (targetDate) => {
 };
 
 export const getUpdatedEventBlocksWithPlacement = (
-  events,
+  events = [],
   incomingRowsMatrix
 ) => {
   const list = [];
   let eventIndex = 0;
   let matrixIndex = 0;
 
-  while (eventIndex < events.length) {
+  while (eventIndex < events?.length) {
     if (matrixIndex in incomingRowsMatrix) {
       list.push({
         isEmpty: true,
@@ -262,7 +262,7 @@ export const calculateIncomingRowMatrix = (eventsByDay, isWeek = false) => {
     // Loop through events:
     // if the duration > 0, insert multiday event duration to incoming rows
 
-    container[day]['events'].forEach((e) => {
+    container[day]['events']?.forEach((e) => {
       if (e.duration > 0) {
         baseIncomingRowsMatrix[rowIndex] = e.duration;
         rowIndex += 1;

@@ -77,7 +77,7 @@ const CalendarViewGridItem = ({
       }
     });
   };
-
+  console.log('MOnth date ', month, date);
   return (
     <div className='flex flex-col bg-white'>
       {/* Item Header */}
