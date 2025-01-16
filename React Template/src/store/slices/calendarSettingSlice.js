@@ -8,7 +8,7 @@ export const CalendarViewTypes = {
 
 const initialState = {
   targetDate: new Date(),
-  calendarViewType: CalendarViewTypes.DAY_VIEW,
+  calendarViewType: CalendarViewTypes.MONTH_VIEW,
   isCreateEventModalOpen: false,
   selectedEvent: {
     eventUid: '',

@@ -80,7 +80,10 @@ const Header1 = () => {
               <div className='col-lg-2 col-5'>
                 <div className='site-branding'>
                   <Link className='brand-logo' href='/'>
-                    <img src='/assets/images/logo/logo-1.png' alt='Brand Logo' />
+                    <img
+                      src='/assets/images/logo/logo-1.png'
+                      alt='Brand Logo'
+                    />
                   </Link>
                 </div>
               </div>
@@ -110,7 +113,7 @@ const Header1 = () => {
                         </ul>
                       </li>
                       <li className='menu-item '>
-                        <Link href='/calendar/day'>{t('menu_calendar')}</Link>
+                        <Link href='/calendar/month'>{t('menu_calendar')}</Link>
                       </li>
 
                       <Contact />
